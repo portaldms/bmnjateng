@@ -340,7 +340,7 @@
     <!-- JAVASCRIPT LOGIC ENGINE (FAST LOAD OPTIMIZED) -->
     <script>
         // MASUKKAN URL WEB APP DEPLOYMENT GAS ANDA DI SINI
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxNR-v4pgLRBc8k4xtNVKMj5NpxnCVMT7iphr_z5QViEJcFR9HNLXubq29bMnEYPcPaFw/exec";
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxmFB_T9IVZlNxrO7AfMlUS3tvTRhkue5sPUZpxO6o-lv3MKzmFZ8QMt0edFCHoXhtrzg/exec";
         const LOCAL_STORAGE_CACHE_KEY = 'portal_app_data_cache_v2';
 
         let state = {
@@ -845,13 +845,4 @@
     </script>
 </div>
 
-```eof
 
----
-
-### Hasil Optimasi Kecepatan:
-1. **Waktu Pemuatan Pertama**: **~0.01 detik** (Instan), karena data langsung diambil dari `localStorage` browser.
-2. **Respon Server GAS**: Berkurang dari **3-5 detik** menjadi **~100-300 milidetik** berkat `CacheService` bawaan Apps Script.
-3. **Penyelarasan Data Otomatis**: Saat ada perbaikan/penambahan data dari Admin, *cache* backend dan browser akan otomatis diperbarui tanpa mengganggu kenyamanan pengguna.
-
-Apakah Anda perlu bantuan dalam cara Deploy ulang Web App Google Apps Script-nya?
