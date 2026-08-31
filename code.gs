@@ -5,9 +5,6 @@
  * ============================================================================
  */
 
-/**
- * Entry Point HTTP GET (Public Read / Health Check)
- */
 function doGet(e) {
   var action = e && e.parameter ? e.parameter.action : null;
   var result;
@@ -25,9 +22,6 @@ function doGet(e) {
   return createJsonResponse(result);
 }
 
-/**
- * Entry Point HTTP POST (Action Router & Mutation Engine)
- */
 function doPost(e) {
   var result;
   try {
@@ -64,17 +58,11 @@ function doPost(e) {
   return createJsonResponse(result);
 }
 
-/**
- * Helper Utility: Membentuk output JSON Standar dengan CORS Header
- */
 function createJsonResponse(data) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/**
- * Helper Utility: Mengubah isi Sheet menjadi Array of Objects berdasarkan header baris ke-1
- */
 function sheetToObjects(sheet) {
   if (!sheet) return [];
   const rows = sheet.getDataRange().getValues();
@@ -90,9 +78,6 @@ function sheetToObjects(sheet) {
   });
 }
 
-/**
- * Mengambil seluruh data Kategori dan Hyperlink dari Spreadsheet
- */
 function getPortalData() {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -119,15 +104,11 @@ function getPortalData() {
   }
 }
 
-/**
- * Memverifikasi Login Admin
- */
 function verifyAdminLogin(username, password) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const adminSheet = ss.getSheetByName('Admins');
 
-    // Fallback kredensial jika Sheet Admins belum dibuat
     if (!adminSheet) {
       if (username === 'admin' && password === 'admin123') {
         return { 
@@ -159,9 +140,6 @@ function verifyAdminLogin(username, password) {
   }
 }
 
-/**
- * Menyimpan (Tambah baru atau Update) Data Hyperlink
- */
 function saveLinkData(linkData) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -171,7 +149,6 @@ function saveLinkData(linkData) {
     const data = sheet.getDataRange().getValues();
     let rowIndex = -1;
 
-    // Cari baris jika melakukan Edit (berdasarkan Link_ID)
     if (linkData.Link_ID) {
       for (let i = 1; i < data.length; i++) {
         if (String(data[i][0]) === String(linkData.Link_ID)) {
@@ -211,9 +188,6 @@ function saveLinkData(linkData) {
   }
 }
 
-/**
- * Menghapus data Hyperlink berdasarkan Link_ID
- */
 function deleteLinkData(linkId) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -233,9 +207,6 @@ function deleteLinkData(linkId) {
   }
 }
 
-/**
- * Menambahkan Kategori Baru pada Sheet Categories
- */
 function saveCategoryData(catData) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
