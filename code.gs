@@ -1,9 +1,13 @@
 /**
  * ============================================================================
- * PORTAL DATA HUB & LINK MANAGER (v2.0) - BACKEND JSON API ENGINE
+ * PORTAL DATA HUB & LINK MANAGER (v2.0) - HIGH PERFORMANCE GAS BACKEND
  * File: Code.gs
+ * Feature: CacheService Integration (Instant JSON response)
  * ============================================================================
  */
+
+const CACHE_KEY = 'PORTAL_DATA_CACHE_V2';
+const CACHE_EXPIRATION = 600; // Cache berlaku 10 menit (600 detik)
 
 function doGet(e) {
   var action = e && e.parameter ? e.parameter.action : null;
@@ -41,12 +45,15 @@ function doPost(e) {
         break;
       case 'saveLink':
         result = saveLinkData(payload.linkData);
+        clearPortalCache(); // Clear cache saat data berubah
         break;
       case 'deleteLink':
         result = deleteLinkData(payload.linkId);
+        clearPortalCache(); // Clear cache saat data dihapus
         break;
       case 'saveCategory':
         result = saveCategoryData(payload.catData);
+        clearPortalCache(); // Clear cache saat kategori berubah
         break;
       default:
         result = { status: 'error', message: 'Action backend tidak dikenali: ' + action };
@@ -61,6 +68,13 @@ function doPost(e) {
 function createJsonResponse(data) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function clearPortalCache() {
+  try {
+    var cache = CacheService.getScriptCache();
+    cache.remove(CACHE_KEY);
+  } catch(e) {}
 }
 
 function sheetToObjects(sheet) {
@@ -79,6 +93,19 @@ function sheetToObjects(sheet) {
 }
 
 function getPortalData() {
+  var cache = CacheService.getScriptCache();
+  var cachedData = cache.get(CACHE_KEY);
+
+  // Kembalikan data dari Cache jika tersedia (Kecepatan ~100ms)
+  if (cachedData != null) {
+    try {
+      var parsed = JSON.parse(cachedData);
+      parsed.fromCache = true;
+      return parsed;
+    } catch(e) {}
+  }
+
+  // Jika cache kosong, baca dari Spreadsheet
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const catSheet = ss.getSheetByName('Categories');
@@ -94,11 +121,15 @@ function getPortalData() {
     const categories = sheetToObjects(catSheet);
     const links = sheetToObjects(linkSheet);
 
-    return {
+    const result = {
       status: 'success',
       categories: categories,
       links: links
     };
+
+    // Simpan ke CacheService untuk query berikutnya
+    cache.put(CACHE_KEY, JSON.stringify(result), CACHE_EXPIRATION);
+    return result;
   } catch (err) {
     return { status: 'error', message: err.toString() };
   }
